@@ -64,6 +64,43 @@
   margin-bottom: var(--space-6);
 }
 
+/* Stats Row */
+.statsRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.statBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--surface-container-low);
+  border: var(--ghost-border);
+  border-radius: var(--radius-lg);
+  min-width: 80px;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.statLabel {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--outline);
+}
+
 .stackPills {
   display: flex;
   justify-content: center;
@@ -131,6 +168,16 @@
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--on-surface);
+}
+
+.skillCount {
+  margin-left: auto;
+  padding: var(--space-1) var(--space-3);
+  background: rgba(124, 58, 237, 0.1);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--primary);
 }
 
 /* ---- Phase List ---- */
@@ -315,6 +362,8 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
 }
 
 .skillFileIcon {
@@ -328,6 +377,7 @@
   font-weight: 600;
   color: var(--on-surface);
   margin-bottom: 2px;
+  word-break: break-all;
 }
 
 .skillFileDesc {
@@ -341,6 +391,34 @@
   font-size: 0.6875rem;
   color: var(--outline);
   font-weight: 500;
+}
+
+.skillFileActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}
+
+.previewBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-container);
+  border: var(--ghost-border);
+  border-radius: var(--radius-md);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.previewBtn:hover {
+  background: var(--surface-container-highest);
+  color: var(--primary);
 }
 
 .downloadBtn {
@@ -368,6 +446,130 @@
   width: 100%;
   justify-content: center;
   margin-bottom: var(--space-8);
+}
+
+/* ---- Preview Modal ---- */
+.previewOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.previewModal {
+  width: 100%;
+  max-width: 760px;
+  max-height: 85vh;
+  background: var(--surface-container);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.25s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(74, 68, 85, 0.12);
+  flex-shrink: 0;
+}
+
+.previewHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--primary);
+}
+
+.previewFileName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.previewActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.previewDownloadBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary-container);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.previewDownloadBtn:hover {
+  box-shadow: var(--shadow-glow);
+  filter: brightness(1.1);
+}
+
+.previewCloseBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--outline);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.previewCloseBtn:hover {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+.previewBody {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-5);
+}
+
+.previewContent {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--on-surface-variant);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--surface-container-low);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  border: var(--ghost-border);
 }
 
 /* ---- Stripe Section ---- */
@@ -464,5 +666,18 @@
 @media (max-width: 900px) {
   .resultsLayout {
     grid-template-columns: 1fr;
+  }
+
+  .statsRow {
+    gap: var(--space-3);
+  }
+
+  .statBadge {
+    padding: var(--space-2) var(--space-4);
+    min-width: 70px;
+  }
+
+  .previewModal {
+    max-height: 90vh;
   }
 }

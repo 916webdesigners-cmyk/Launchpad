@@ -7,12 +7,13 @@ import Footer from "@/components/Footer";
 import type { GeneratedWorkflow, SkillFile } from "@/types";
 import styles from "./page.module.css";
 
-const PHASE_ICONS = ["🏗️", "🎨", "⚙️", "💳", "🚀", "🔧"];
+const PHASE_ICONS = ["🏗️", "🎨", "⚙️", "💳", "🚀", "🔧", "📊", "🧪"];
 
 export default function ResultsPage() {
   const router = useRouter();
   const [workflow, setWorkflow] = useState<GeneratedWorkflow | null>(null);
   const [expandedPhase, setExpandedPhase] = useState<number | null>(0);
+  const [previewFile, setPreviewFile] = useState<SkillFile | null>(null);
 
   useEffect(() => {
     const storedWorkflow = sessionStorage.getItem("launchpad_workflow");
@@ -39,8 +40,8 @@ export default function ResultsPage() {
 
   const handleDownloadAll = () => {
     if (!workflow) return;
-    workflow.skillFiles.forEach((file) => {
-      setTimeout(() => handleDownload(file), 100);
+    workflow.skillFiles.forEach((file, i) => {
+      setTimeout(() => handleDownload(file), i * 150);
     });
   };
 
@@ -61,6 +62,42 @@ export default function ResultsPage() {
   return (
     <>
       <Navbar />
+
+      {/* Skill File Preview Modal */}
+      {previewFile && (
+        <div className={styles.previewOverlay} onClick={() => setPreviewFile(null)}>
+          <div className={styles.previewModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.previewHeader}>
+              <div className={styles.previewHeaderLeft}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <span className={styles.previewFileName}>{previewFile.fileName}</span>
+              </div>
+              <div className={styles.previewActions}>
+                <button className={styles.previewDownloadBtn} onClick={() => handleDownload(previewFile)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download
+                </button>
+                <button className={styles.previewCloseBtn} onClick={() => setPreviewFile(null)}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className={styles.previewBody}>
+              <pre className={styles.previewContent}>{previewFile.fileContent}</pre>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className={styles.main}>
         {/* Header */}
@@ -88,6 +125,22 @@ export default function ResultsPage() {
             <p className={styles.headerSubtitle}>
               {workflow.projectSummary}
             </p>
+
+            {/* Stats row */}
+            <div className={styles.statsRow}>
+              <div className={styles.statBadge}>
+                <span className={styles.statNumber}>{workflow.phases.length}</span>
+                <span className={styles.statLabel}>Phases</span>
+              </div>
+              <div className={styles.statBadge}>
+                <span className={styles.statNumber}>{workflow.skillFiles.length}</span>
+                <span className={styles.statLabel}>Skill Files</span>
+              </div>
+              <div className={styles.statBadge}>
+                <span className={styles.statNumber}>{workflow.recommendedStack?.length || 0}</span>
+                <span className={styles.statLabel}>Tools</span>
+              </div>
+            </div>
 
             {workflow.recommendedStack && workflow.recommendedStack.length > 0 && (
               <div className={styles.stackPills}>
@@ -170,12 +223,13 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Right Column: Skill Files + Examples */}
+          {/* Right Column: Skill Files + Stripe + Examples */}
           <div className={styles.rightColumn}>
             {/* Skill Files */}
             <div className={styles.sectionHeader}>
               <span className={styles.sectionIcon}>📁</span>
               <h2 className={styles.sectionTitle}>Your Skill Files</h2>
+              <span className={styles.skillCount}>{workflow.skillFiles.length} files</span>
             </div>
 
             <div className={styles.skillFileList}>
@@ -196,22 +250,35 @@ export default function ResultsPage() {
                       <p className={styles.skillFileMeta}>Markdown · Ready to use</p>
                     </div>
                   </div>
-                  <button
-                    className={styles.downloadBtn}
-                    onClick={() => handleDownload(file)}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                  </button>
+                  <div className={styles.skillFileActions}>
+                    <button
+                      className={styles.previewBtn}
+                      onClick={() => setPreviewFile(file)}
+                      title="Preview"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                    <button
+                      className={styles.downloadBtn}
+                      onClick={() => handleDownload(file)}
+                      title="Download"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
 
             <button className={`btn-secondary ${styles.downloadAllBtn}`} onClick={handleDownloadAll}>
-              Download All Files
+              Download All {workflow.skillFiles.length} Files
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />

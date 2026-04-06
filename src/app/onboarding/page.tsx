@@ -22,6 +22,10 @@ const FEATURE_OPTIONS = [
   { id: "mobile", icon: "📱", label: "Mobile Optimization", desc: "Responsive layouts for all devices." },
   { id: "seo", icon: "🔍", label: "SEO Setup", desc: "Built-in search engine visibility tools." },
   { id: "ai", icon: "🤖", label: "AI Integration", desc: "Smart features and automation." },
+  { id: "analytics", icon: "📈", label: "Analytics & Tracking", desc: "Google Analytics, Mixpanel, and event tracking." },
+  { id: "email", icon: "✉️", label: "Email Marketing", desc: "Newsletters, drip campaigns, and transactional emails." },
+  { id: "cms", icon: "📝", label: "CMS / Blog Engine", desc: "Content authoring, drafts, and publishing." },
+  { id: "i18n", icon: "🌍", label: "Multi-language (i18n)", desc: "Internationalization and locale support." },
 ];
 
 const LOADING_MESSAGES = [
