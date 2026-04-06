@@ -141,8 +141,8 @@ export function buildWorkflowPrompt(answers: QuestionnaireAnswers): string {
     );
   }
 
-  // Cap at 8 skill files to keep response manageable
-  const cappedDirectives = skillDirectives.slice(0, 8);
+  // Cap at 4 skill files to keep response size within safe token limits and prevent truncation
+  const cappedDirectives = skillDirectives.slice(0, 4);
   const skillCount = cappedDirectives.length;
 
   return `
@@ -169,22 +169,20 @@ You must respond ONLY with a valid JSON object matching this exact structure —
       "fileContent": "Full markdown content — see formatting rules below"
     }
   ],
-  "stripeGuide": "Detailed Stripe integration guide specific to their stack, or null if not needed",
+  "stripeGuide": "Detailed Stripe integration guide specific to their stack, or empty string if not needed",
   "recommendedStack": ["Tool 1", "Tool 2", "Tool 3", "Tool 4", "Tool 5"],
   "warnings": ["Any important warnings, gotchas, version conflicts, or security considerations"]
 }
 
 PHASE GENERATION RULES:
-- Generate between 4 and 6 workflow phases (this is a professional-grade workflow, not a weekend hack)
-- Each phase should have 3-5 specific, actionable steps — not vague platitudes
-- Steps should reference exact tools, commands, or filenames where applicable
+- Generate exactly 4 to 5 workflow phases maximum.
+- Each phase must contain exactly 3-4 specific steps.
 - Include estimated time ranges calibrated to their skill level: ${answers.skillLevel}
 - Phase ordering should follow industry-standard SDLC: Discovery → Design → Build → Integrate → Test → Deploy
-- Each phase must list the specific tools used in that phase from their stack
 
 SKILL FILE GENERATION RULES:
 - Generate exactly ${skillCount} skill files as specified below
-- Each skill file should be 600-1200 words of genuinely useful content
+- Each skill file should be VERY CONCISE (400 to 600 words). Do not write extremely long documents.
 - Every skill file MUST follow this structure:
   1. YAML-style frontmatter block (name, description, difficulty)
   2. Overview section explaining the "why" and context
@@ -198,20 +196,17 @@ SKILL FILE GENERATION RULES:
 - The content must be OPINIONATED and SPECIFIC — written as if by a senior developer who has shipped dozens of production projects
 - Include real package names, version-specific advice, and proven patterns
 - Never say "consider doing X" — say "do X because Y"
-- Tailor complexity to their skill level:
-  - Beginner: More explanation, simpler patterns, warnings about common mistakes
-  - Intermediate: Balanced depth, best practices, some advanced tips
-  - Advanced: Concise, architecture-focused, performance optimization, edge cases
+- Tailor complexity to their skill level.
 
 SPECIFIC SKILL FILES TO GENERATE:
 ${cappedDirectives.join("\n")}
 
-ADDITIONAL RULES:
-- If recommending a tech stack, always explain WHY each tool was chosen for their specific use case
-- Warnings should be genuinely useful (e.g. "Stripe webhooks require HTTPS — use ngrok or Stripe CLI for local testing" not "make sure to test your code")
-- The recommendedStack array should include 4-6 specific technologies with brief rationale
-- CRITICAL: You must escape ALL quotes (\\"), backslashes (\\\\), and newlines (\\n) inside the "fileContent" string properly. It must be valid parsable JSON. Do not use raw literal newlines in the strings.
-- For code blocks inside fileContent, use escaped backticks: \\\\\`\\\\\`\\\\\`
+CRITICAL STRUCTURAL RULES (PREVENT INFINITE LOOPS):
+- The "recommendedStack" array MUST contain exactly 4 to 6 string items. Do not generate massive lists.
+- The "warnings" array MUST contain exactly 2 to 3 warnings.
+- The "tools" array in each phase MUST contain exactly 2 to 4 tools.
+- Keep the overall response as concise as possible while delivering high value.
+- Do not hallucinate endless parameter definitions.
 
 HERE IS THE USER'S PROJECT INFORMATION:
 
