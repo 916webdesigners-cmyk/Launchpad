@@ -18,6 +18,41 @@ export async function callGemini(prompt: string): Promise<string> {
         temperature: 0.6,
         maxOutputTokens: 65536,
         responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            projectSummary: { type: "STRING" },
+            phases: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  phaseNumber: { type: "INTEGER" },
+                  phaseName: { type: "STRING" },
+                  description: { type: "STRING" },
+                  estimatedTime: { type: "STRING" },
+                  steps: { type: "ARRAY", items: { type: "STRING" } },
+                  tools: { type: "ARRAY", items: { type: "STRING" } }
+                }
+              }
+            },
+            skillFiles: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  fileName: { type: "STRING" },
+                  description: { type: "STRING" },
+                  fileContent: { type: "STRING" }
+                }
+              }
+            },
+            stripeGuide: { type: "STRING" },
+            recommendedStack: { type: "ARRAY", items: { type: "STRING" } },
+            warnings: { type: "ARRAY", items: { type: "STRING" } }
+          },
+          required: ["projectSummary", "phases", "skillFiles", "recommendedStack", "warnings"]
+        }
       },
     }),
   });
