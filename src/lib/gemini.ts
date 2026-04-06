@@ -33,7 +33,8 @@ export async function callGemini(prompt: string): Promise<string> {
                   estimatedTime: { type: "STRING" },
                   steps: { type: "ARRAY", items: { type: "STRING" } },
                   tools: { type: "ARRAY", items: { type: "STRING" } }
-                }
+                },
+                required: ["phaseNumber", "phaseName", "description", "estimatedTime", "steps", "tools"]
               }
             },
             skillFiles: {
@@ -44,7 +45,8 @@ export async function callGemini(prompt: string): Promise<string> {
                   fileName: { type: "STRING" },
                   description: { type: "STRING" },
                   fileContent: { type: "STRING" }
-                }
+                },
+                required: ["fileName", "description", "fileContent"]
               }
             },
             stripeGuide: { type: "STRING" },
