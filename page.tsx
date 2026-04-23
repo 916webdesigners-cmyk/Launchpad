@@ -1,160 +1,259 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/AuthContext";
+import { useRouter } from "next/navigation";
+import { collection, query, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Link from "next/link";
 import styles from "./page.module.css";
+import { FiPlus, FiChevronDown, FiChevronUp, FiTrash2, FiSave } from "react-icons/fi";
 
-const TOOLS = [
-  "Figma",
-  "Google Stitch",
-  "Webflow",
-  "Framer",
-  "VS Code",
-  "Cursor",
-  "Stripe",
-  "Supabase",
-  "Firebase",
-  "Vercel",
-  "GitHub",
-  "Netlify",
-];
+interface WebsiteWorkflow {
+  id: string;
+  url: string;
+  title: string;
+  outline: string;
+  createdAt: any;
+}
 
-const FEATURES = [
-  {
-    icon: "⚡",
-    title: "Skip The Boilerplate",
-    description:
-      "Connect your favorite stack. We automate the foundational code so you can focus on building unique features and creative experiences.",
-  },
-  {
-    icon: "🎨",
-    title: "Total Creative Control",
-    description:
-      "Unlike rigid site builders, you own the code. Get pure, unopinionated files ready for any environment and fully customizable. Build exactly what you envision.",
-  },
-  {
-    icon: "🏗️",
-    title: "System-Level Infrastructure",
-    description:
-      "Pre-configured for scale. Go beyond a simple starter pack with auth, billing, and team-ready architectures available from day one.",
-  },
-];
+export default function WorkflowsPage() {
+  const { currentUser, loading } = useAuth();
+  const router = useRouter();
+  
+  const [workflows, setWorkflows] = useState<WebsiteWorkflow[]>([]);
+  const [fetching, setFetching] = useState(true);
+  
+  const [newUrl, setNewUrl] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
-export default function LandingPage() {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingOutline, setEditingOutline] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    if (!loading && !currentUser) {
+      router.push("/login");
+    }
+  }, [loading, currentUser, router]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchWorkflows();
+    }
+  }, [currentUser]);
+
+  const fetchWorkflows = async () => {
+    if (!currentUser) return;
+    setFetching(true);
+    try {
+      const q = query(
+        collection(db, `users/${currentUser.uid}/workflows`),
+        orderBy("createdAt", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+      const items: WebsiteWorkflow[] = [];
+      querySnapshot.forEach((docSnap) => {
+        items.push({ id: docSnap.id, ...docSnap.data() } as WebsiteWorkflow);
+      });
+      setWorkflows(items);
+    } catch (error) {
+      console.error("Error fetching workflows:", error);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const handleAddWebsite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentUser || !newUrl || !newTitle) return;
+    
+    setIsAdding(true);
+    try {
+      const docRef = await addDoc(collection(db, `users/${currentUser.uid}/workflows`), {
+        url: newUrl,
+        title: newTitle,
+        outline: "",
+        createdAt: serverTimestamp(),
+      });
+      
+      const newWorkflow: WebsiteWorkflow = {
+        id: docRef.id,
+        url: newUrl,
+        title: newTitle,
+        outline: "",
+        createdAt: new Date(),
+      };
+      
+      setWorkflows([newWorkflow, ...workflows]);
+      setNewUrl("");
+      setNewTitle("");
+    } catch (error) {
+      console.error("Error adding website:", error);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const toggleExpand = (id: string, currentOutline: string) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(id);
+      if (!(id in editingOutline)) {
+        setEditingOutline((prev) => ({ ...prev, [id]: currentOutline }));
+      }
+    }
+  };
+
+  const handleSaveOutline = async (id: string) => {
+    if (!currentUser) return;
+    const newOutline = editingOutline[id];
+    
+    try {
+      const docRef = doc(db, `users/${currentUser.uid}/workflows`, id);
+      await updateDoc(docRef, {
+        outline: newOutline
+      });
+      
+      setWorkflows((prev) => 
+        prev.map(w => w.id === id ? { ...w, outline: newOutline } : w)
+      );
+    } catch (error) {
+      console.error("Error updating outline:", error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!currentUser) return;
+    if (!confirm("Are you sure you want to delete this website workflow?")) return;
+    
+    try {
+      const docRef = doc(db, `users/${currentUser.uid}/workflows`, id);
+      await deleteDoc(docRef);
+      setWorkflows((prev) => prev.filter(w => w.id !== id));
+      if (expandedId === id) setExpandedId(null);
+    } catch (error) {
+      console.error("Error deleting workflow:", error);
+    }
+  };
+
+  if (loading || (!currentUser && !loading)) {
+    return (
+      <>
+        <Navbar />
+        <main className={styles.main}>
+          <div className={styles.loading}>Loading...</div>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
-
       <main className={styles.main}>
-        {/* Hero Section */}
-        <section className={styles.hero}>
-          <div className={styles.heroGlow} />
-          <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>
-              <span className={styles.heroBadgeDot} />
-              Now in Public Beta
-            </div>
-            <h1 className={styles.heroTitle}>
-              Skip the setup.{" "}
-              <span className="gradient-text">Build what actually matters.</span>
-            </h1>
-            <p className={styles.heroSubtitle}>
-              A repeatable infrastructure system for technical founders, agencies, and builders. Don't let rigid site builders box in your creativity. Own your code, push to production in days, and get to revenue faster.
-            </p>
-            <div className={styles.heroCtas}>
-              <Link href="/onboarding" className={`btn-primary ${styles.heroBtn}`}>
-                Start Building
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
-              <a href="#how-it-works" className="btn-secondary">
-                See How It Works
-              </a>
-            </div>
-            <div className={styles.trustBadges}>
-              <span>🚀 Go from idea to MVP in days</span>
-              <span className={styles.trustDivider}>·</span>
-              <span>🎨 Total creative ownership</span>
-              <span className={styles.trustDivider}>·</span>
-              <span>💳 Revenue-focused integrations</span>
-            </div>
-          </div>
-        </section>
+        <div className="container">
+          <header className={styles.header}>
+            <h1 className={styles.title}>Your Workflows</h1>
+            <p className={styles.subtitle}>Save specific websites and expand them into detailed outlines.</p>
+          </header>
 
-        {/* Tool Marquee */}
-        <section className={styles.marqueeSection}>
-          <div className={styles.marqueeTrack}>
-            <div className={styles.marqueeContent}>
-              {[...TOOLS, ...TOOLS].map((tool, i) => (
-                <span key={i} className={styles.marqueePill}>
-                  {tool}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section id="how-it-works" className={styles.featuresSection}>
-          <div className="container">
-            <div className={styles.featureHeader}>
-              <h2 className={styles.featureSectionTitle}>
-                Built For Builders, Not Website Creators
-              </h2>
-              <p className={styles.featureSectionSubtitle}>
-                Stop fighting tools that limit what you can build. LaunchPad gives you the speed of a site builder combined with the absolute freedom of custom code. 
-              </p>
-            </div>
-            <div className={styles.featureGrid}>
-              {FEATURES.map((feature, i) => (
-                <div key={i} className={styles.featureCard}>
-                  <span className={styles.featureIcon}>{feature.icon}</span>
-                  <h3 className={styles.featureTitle}>{feature.title}</h3>
-                  <p className={styles.featureDescription}>
-                    {feature.description}
-                  </p>
+          <section className={styles.addSection}>
+            <div className={styles.card}>
+              <h2 className={styles.cardTitle}>Add New Website</h2>
+              <form onSubmit={handleAddWebsite} className={styles.addForm}>
+                <div className={styles.inputRow}>
+                  <div className={styles.inputGroup}>
+                    <label>Website Title</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Stripe Landing Page" 
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className={styles.inputGroup}>
+                    <label>URL</label>
+                    <input 
+                      type="url" 
+                      placeholder="https://..." 
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-              ))}
+                <button type="submit" className={`btn-primary ${styles.addBtn}`} disabled={isAdding}>
+                  {isAdding ? "Adding..." : <><FiPlus /> Add Website</>}
+                </button>
+              </form>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* CTA Section */}
-        <section className={styles.ctaSection}>
-          <div className={styles.ctaGlow} />
-          <div className="container text-center">
-            <h2 className={styles.ctaTitle}>
-              Ready to launch your next project?
-            </h2>
-            <p className={styles.ctaSubtitle}>
-              Join 1,000+ developers engineering the future of the web with
-              LaunchPad.
-            </p>
-            <Link href="/onboarding" className={`btn-primary ${styles.ctaBtn}`}>
-              Build My Workflow
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-        </section>
+          <section className={styles.workflowsList}>
+            {fetching ? (
+              <div className={styles.loading}>Fetching your saved websites...</div>
+            ) : workflows.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p>You haven't saved any websites yet. Add one above to get started!</p>
+              </div>
+            ) : (
+              workflows.map((wf) => (
+                <div key={wf.id} className={`${styles.workflowCard} ${expandedId === wf.id ? styles.expanded : ''}`}>
+                  <div 
+                    className={styles.workflowHeader} 
+                    onClick={() => toggleExpand(wf.id, wf.outline)}
+                  >
+                    <div className={styles.workflowInfo}>
+                      <h3>{wf.title}</h3>
+                      <a href={wf.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                        {wf.url}
+                      </a>
+                    </div>
+                    <div className={styles.workflowActions}>
+                      <button 
+                        className={styles.iconBtn} 
+                        onClick={(e) => { e.stopPropagation(); handleDelete(wf.id); }}
+                        title="Delete Website"
+                      >
+                        <FiTrash2 />
+                      </button>
+                      <button className={styles.expandBtn}>
+                        {expandedId === wf.id ? <FiChevronUp /> : <FiChevronDown />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {expandedId === wf.id && (
+                    <div className={styles.workflowBody}>
+                      <div className={styles.outlineEditor}>
+                        <label>Workflow Outline / Notes</label>
+                        <textarea
+                          placeholder="Write your detailed outline, feature breakdown, or notes for this website..."
+                          value={editingOutline[wf.id] ?? wf.outline}
+                          onChange={(e) => setEditingOutline(prev => ({ ...prev, [wf.id]: e.target.value }))}
+                          rows={8}
+                        />
+                        <div className={styles.editorActions}>
+                          <button 
+                            className={`btn-primary ${styles.saveBtn}`}
+                            onClick={() => handleSaveOutline(wf.id)}
+                            disabled={editingOutline[wf.id] === wf.outline}
+                          >
+                            <FiSave /> {editingOutline[wf.id] === wf.outline ? "Saved" : "Save Outline"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </section>
+        </div>
       </main>
-
-      <Footer />
     </>
   );
 }
