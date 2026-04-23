@@ -41,7 +41,6 @@ const STEP_LABELS = ["Vision", "Stack", "Features", "Timeline", "Preferences"];
 const initialAnswers: QuestionnaireAnswers = {
   projectDescription: "",
   websiteType: "",
-  skillLevel: "",
   designTools: [],
   buildTools: [],
   hostingTools: [],
@@ -123,7 +122,7 @@ export default function OnboardingPage() {
   const canProceed = () => {
     switch (step) {
       case 0:
-        return answers.projectDescription.trim().length > 10 && answers.websiteType && answers.skillLevel;
+        return answers.projectDescription.trim().length > 10 && answers.websiteType;
       case 1:
         return answers.designTools.length > 0 || answers.buildTools.length > 0;
       case 2:
@@ -212,48 +211,24 @@ export default function OnboardingPage() {
                 />
               </div>
 
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Website Type</label>
-                  <select
-                    className="select-field"
-                    value={answers.websiteType}
-                    onChange={(e) =>
-                      setAnswers({ ...answers, websiteType: e.target.value })
-                    }
-                  >
-                    <option value="">Select type...</option>
-                    <option value="Portfolio">Portfolio</option>
-                    <option value="E-commerce">E-commerce</option>
-                    <option value="SaaS">SaaS</option>
-                    <option value="Blog">Blog</option>
-                    <option value="Business/Agency">Business/Agency</option>
-                    <option value="Booking/Service">Booking/Service</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Your Skill Level</label>
-                  <select
-                    className="select-field"
-                    value={answers.skillLevel}
-                    onChange={(e) =>
-                      setAnswers({ ...answers, skillLevel: e.target.value })
-                    }
-                  >
-                    <option value="">Select level...</option>
-                    <option value="Beginner">
-                      Beginner (little to no experience)
-                    </option>
-                    <option value="Intermediate">
-                      Intermediate (built a few sites)
-                    </option>
-                    <option value="Advanced">
-                      Advanced (comfortable with code)
-                    </option>
-                  </select>
-                </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Website Type</label>
+                <select
+                  className="select-field"
+                  value={answers.websiteType}
+                  onChange={(e) =>
+                    setAnswers({ ...answers, websiteType: e.target.value })
+                  }
+                >
+                  <option value="">Select type...</option>
+                  <option value="B2B SaaS">B2B SaaS</option>
+                  <option value="B2C SaaS / Web App">B2C SaaS / Web App</option>
+                  <option value="Marketplace">Marketplace</option>
+                  <option value="Agency Client Portal">Agency Client Portal</option>
+                  <option value="Internal Tool">Internal Tool</option>
+                  <option value="E-commerce">E-commerce</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
           )}

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/AuthContext";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { currentUser, logout, loading } = useAuth();
   const isLanding = pathname === "/";
 
   return (
@@ -38,9 +40,16 @@ export default function Navbar() {
             <a href="#how-it-works" className="btn-ghost">
               How It Works
             </a>
-            <a href="#examples" className="btn-ghost">
-              Examples
-            </a>
+            {!loading && !currentUser && (
+              <Link href="/login" className="btn-ghost">
+                Log In
+              </Link>
+            )}
+            {!loading && currentUser && (
+              <Link href="/workflows" className="btn-ghost">
+                Workflows
+              </Link>
+            )}
             <Link href="/onboarding" className="btn-primary">
               Build My Workflow
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -52,9 +61,26 @@ export default function Navbar() {
 
         {!isLanding && (
           <div className={styles.navLinks}>
-            <Link href="/" className="btn-ghost">
-              ← Back to Home
-            </Link>
+            {!loading && currentUser && (
+              <>
+                <Link href="/workflows" className="btn-ghost">
+                  Workflows
+                </Link>
+                <button onClick={logout} className="btn-ghost">
+                  Log Out
+                </button>
+              </>
+            )}
+            {!loading && !currentUser && pathname !== "/login" && (
+              <Link href="/login" className="btn-ghost">
+                Log In
+              </Link>
+            )}
+            {pathname !== "/" && (
+              <Link href="/" className="btn-ghost">
+                ← Back to Home
+              </Link>
+            )}
           </div>
         )}
       </div>

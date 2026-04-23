@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/lib/AuthContext";
 
 export const metadata: Metadata = {
-  title: "LaunchPad — Your Entire Website Build. One Intelligent Workflow.",
+  title: "LaunchPad — Skip the setup. Build what actually matters.",
   description:
-    "Tell us about your project. We'll generate a step-by-step workflow, skill guides, and markdown files tailored specifically to how you build.",
-  keywords: ["web development", "workflow", "website builder", "developer tools", "LaunchPad"],
+    "A repeatable infrastructure system for technical founders and agencies. Retain total creative freedom without rebuilding the same boilerplates.",
+  keywords: ["web development", "infrastructure", "startup tools", "agency boilerplates", "LaunchPad"],
   openGraph: {
-    title: "LaunchPad — One Intelligent Workflow",
-    description: "Automate the heavy lifting from wireframe to deployment.",
+    title: "LaunchPad — A repeatable system for launching",
+    description: "Don't let rigid site builders box in your creativity. Own your code, push to production in days, and get to revenue faster.",
     type: "website",
   },
 };
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -2,7 +2,6 @@ export type QuestionnaireAnswers = {
   // Step 1 - Vision
   projectDescription: string;
   websiteType: string;
-  skillLevel: string;
 
   // Step 2 - Stack
   designTools: string[];

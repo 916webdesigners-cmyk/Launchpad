@@ -21,21 +21,21 @@ const TOOLS = [
 const FEATURES = [
   {
     icon: "⚡",
-    title: "Personalized Workflows",
+    title: "Skip The Boilerplate",
     description:
-      "Tailor your pipeline to match your exact tech stack. From React to Rust, we automate the boring bits so you can focus on code.",
+      "Connect your favorite stack. We automate the foundational code so you can focus on building unique features and creative experiences.",
   },
   {
-    icon: "📁",
-    title: "Downloadable Skill Files",
+    icon: "🎨",
+    title: "Total Creative Control",
     description:
-      "Export your entire build as clean Markdown and structured JSON. Pure, unopinionated files ready for any environment.",
+      "Unlike rigid site builders, you own the code. Get pure, unopinionated files ready for any environment and fully customizable. Build exactly what you envision.",
   },
   {
-    icon: "🔗",
-    title: "End-to-End Coverage",
+    icon: "🏗️",
+    title: "System-Level Infrastructure",
     description:
-      "From the first wireframe to final production deploy. We maintain consistency across every asset and every stage.",
+      "Pre-configured for scale. Go beyond a simple starter pack with auth, billing, and team-ready architectures available from day one.",
   },
 ];
 
@@ -54,13 +54,11 @@ export default function LandingPage() {
               Now in Public Beta
             </div>
             <h1 className={styles.heroTitle}>
-              Your Entire Website Build.{" "}
-              <span className="gradient-text">One Intelligent Workflow.</span>
+              Skip the setup.{" "}
+              <span className="gradient-text">Build what actually matters.</span>
             </h1>
             <p className={styles.heroSubtitle}>
-              Automate the heavy lifting from wireframe to deployment. LaunchPad
-              orchestrates your favorite tools into a seamless, high-performance
-              engine.
+              A repeatable infrastructure system for technical founders, agencies, and builders. Don't let rigid site builders box in your creativity. Own your code, push to production in days, and get to revenue faster.
             </p>
             <div className={styles.heroCtas}>
               <Link href="/onboarding" className={`btn-primary ${styles.heroBtn}`}>
@@ -81,11 +79,11 @@ export default function LandingPage() {
               </a>
             </div>
             <div className={styles.trustBadges}>
-              <span>⚡ Personalized to your stack</span>
+              <span>🚀 Go from idea to MVP in days</span>
               <span className={styles.trustDivider}>·</span>
-              <span>📁 Downloadable markdown files</span>
+              <span>🎨 Total creative ownership</span>
               <span className={styles.trustDivider}>·</span>
-              <span>🔧 From design to Stripe integration</span>
+              <span>💳 Revenue-focused integrations</span>
             </div>
           </div>
         </section>
@@ -108,12 +106,10 @@ export default function LandingPage() {
           <div className="container">
             <div className={styles.featureHeader}>
               <h2 className={styles.featureSectionTitle}>
-                Built For How You Actually Work
+                Built For Builders, Not Website Creators
               </h2>
               <p className={styles.featureSectionSubtitle}>
-                Stop fighting your tools. LaunchPad connects every stage of your
-                development cycle into a unified, high-performance delivery
-                machine.
+                Stop fighting tools that limit what you can build. LaunchPad gives you the speed of a site builder combined with the absolute freedom of custom code. 
               </p>
             </div>
             <div className={styles.featureGrid}>
